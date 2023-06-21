@@ -12,6 +12,9 @@ export class Stock {
   @Column({ nullable: false })
   symbol: string;
 
+  @Column({ nullable: false })
+  lotSize: number;
+
   @OneToMany(() => OHLC, (ohlc) => ohlc.stock)
   data: OHLC[];
 }
