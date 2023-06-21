@@ -7,7 +7,7 @@ export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
   @Get()
   findAll() {
-    return 'all stocks';
+    return this.stocksService.getAllStock();
   }
 
   @Post()
