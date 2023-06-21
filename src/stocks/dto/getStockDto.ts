@@ -1,5 +1,5 @@
-import { IsString } from 'class-validator';
+import { IsNumber } from 'class-validator';
 export class GetStockDto {
-  @IsString()
-  stock: string;
+  @IsNumber()
+  stock: number;
 }
