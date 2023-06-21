@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { OHLC } from './ohlc.entity';
 
 @Entity('stocks')
 export class Stock {
@@ -10,4 +11,7 @@ export class Stock {
 
   @Column({ nullable: false })
   symbol: string;
+
+  @OneToMany(() => OHLC, (ohlc) => ohlc.stock)
+  data: OHLC[];
 }
