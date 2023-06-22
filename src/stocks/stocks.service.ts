@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { map } from 'rxjs';
 import { Stock } from 'src/entities/stocks.entity';
 import { Repository } from 'typeorm';
 
@@ -30,11 +31,9 @@ export class StocksService {
       fromDate: '2023-01-01',
       toDate: '2023-06-21',
     };
-    const response = this.httpService.post(
-      'https://api.dhan.co/charts/historical',
-      data,
-      { headers },
-    );
+    const response = this.httpService
+      .post('https://api.dhan.co/charts/historical', data, { headers })
+      .pipe(map((resp) => resp.data));
     return response;
   }
 }
