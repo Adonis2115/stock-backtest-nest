@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { OHLC } from './entities/ohlc.entity';
 import { Stock } from './entities/stocks.entity';
 import { StocksModule } from './stocks/stocks.module';
+import { MomentumModule } from './scanner/momentum/momentum.module';
+import { TrendModule } from './strategy/trend/trend.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { StocksModule } from './stocks/stocks.module';
       entities: [Stock, OHLC],
       synchronize: true,
     }),
+    MomentumModule,
+    TrendModule,
   ],
   controllers: [AppController],
   providers: [AppService],
