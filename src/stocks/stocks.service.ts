@@ -20,6 +20,12 @@ export class StocksService {
   async getAllStock() {
     return await this.stockRepo.find();
   }
+  async getStockOhlc(id: number) {
+    return await this.stockRepo.findOne({
+      where: { id: id },
+      relations: ['data'],
+    });
+  }
   async getStockData(
     id: number,
     fromDate: string,
