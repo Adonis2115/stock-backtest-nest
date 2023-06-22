@@ -12,6 +12,7 @@
 * Unique for Symbol in stock
 * Unique for time and stock in combination in OHLC
 * ormconfig.ts is not being used
+* Add seed code for Stocks for fresh DB
 ```
 
 ## Installation
