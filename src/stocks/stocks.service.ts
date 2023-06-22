@@ -45,7 +45,7 @@ export class StocksService {
   }
   async fetchAllPrices(fromDate: string, toDate: string) {
     const stocks = await this.stockRepo.find();
-    for (let j = 0; j < 10; j++) {
+    for (let j = 0; j < stocks.length; j++) {
       const data = await this.getStockData(stocks[j].id, fromDate, toDate);
       data.subscribe(
         (data) => {
@@ -64,11 +64,13 @@ export class StocksService {
             }
             this.ohlcRepo.save(records);
           }
+          console.log(`Fetched Data for ${stocks[j].name}`);
         },
         (error) => {
           console.log(error);
         },
       );
+      await sleep(200);
     }
   }
 }
@@ -81,6 +83,10 @@ type DhanHistoricalDataResponse = {
   volume: number[];
   start_Time: number;
 };
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function timeStamp_convertor(n: number) {
   let offset1 = new Date().getTimezoneOffset();
