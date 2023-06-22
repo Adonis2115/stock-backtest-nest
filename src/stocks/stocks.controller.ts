@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GetStockDto } from './dto/getStockDto';
+import { PostFetchAllPricesDto } from './dto/postFetchAllPricesDto';
+import { PostGetStockDataDto } from './dto/postGetStockDataDto';
 import { StocksService } from './stocks.service';
 
 @Controller('stocks')
@@ -16,17 +18,18 @@ export class StocksController {
   }
 
   @Post('/price')
-  getStockData(
-    @Body() stock: { id: number; fromDate: string; toDate: string },
-  ) {
+  getStockData(@Body() postGetStockDataDto: PostGetStockDataDto) {
     return this.stocksService.getStockData(
-      stock.id,
-      stock.fromDate,
-      stock.toDate,
+      postGetStockDataDto.id,
+      postGetStockDataDto.fromDate,
+      postGetStockDataDto.toDate,
     );
   }
   @Post('/priceall')
-  fetchAllPrices(@Body() stock: { fromDate: string; toDate: string }) {
-    return this.stocksService.fetchAllPrices(stock.fromDate, stock.toDate);
+  fetchAllPrices(@Body() postFetchAllPricesDto: PostFetchAllPricesDto) {
+    return this.stocksService.fetchAllPrices(
+      postFetchAllPricesDto.fromDate,
+      postFetchAllPricesDto.toDate,
+    );
   }
 }
