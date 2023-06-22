@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GetStockDto } from './dto/getStockDto';
 import { PostFetchAllPricesDto } from './dto/postFetchAllPricesDto';
 import { PostGetStockDataDto } from './dto/postGetStockDataDto';
+import { PostStockAndOhlcDto } from './dto/postStockAndOhlcDto';
 import { StocksService } from './stocks.service';
 
 @Controller('stocks')
@@ -16,9 +17,21 @@ export class StocksController {
   getStock(@Body() getStockDto: GetStockDto) {
     return this.stocksService.getStock(getStockDto.stock);
   }
+  @Post('/stockohlc')
+  getStockOhlc(@Body() postStockAndOhlcDto: PostStockAndOhlcDto) {
+    return this.stocksService.getStockAndOhlc(
+      postStockAndOhlcDto.id,
+      postStockAndOhlcDto.fromDate,
+      postStockAndOhlcDto.toDate,
+    );
+  }
   @Post('/ohlc')
-  getStockOhlc(@Body() getStockDto: GetStockDto) {
-    return this.stocksService.getStockOhlc(getStockDto.stock);
+  getOhlc(@Body() postStockAndOhlcDto: PostStockAndOhlcDto) {
+    return this.stocksService.getOhlc(
+      postStockAndOhlcDto.id,
+      postStockAndOhlcDto.fromDate,
+      postStockAndOhlcDto.toDate,
+    );
   }
   @Post('/price')
   getStockData(@Body() postGetStockDataDto: PostGetStockDataDto) {
