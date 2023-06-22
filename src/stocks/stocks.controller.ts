@@ -16,7 +16,17 @@ export class StocksController {
   }
 
   @Post('/price')
-  getStockData(@Body() stock: { id: number }) {
-    return this.stocksService.getStockData(stock.id);
+  getStockData(
+    @Body() stock: { id: number; fromDate: string; toDate: string },
+  ) {
+    return this.stocksService.getStockData(
+      stock.id,
+      stock.fromDate,
+      stock.toDate,
+    );
+  }
+  @Post('/priceall')
+  fetchAllPrices(@Body() stock: { fromDate: string; toDate: string }) {
+    return this.stocksService.fetchAllPrices(stock.fromDate, stock.toDate);
   }
 }

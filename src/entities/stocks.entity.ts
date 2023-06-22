@@ -15,6 +15,6 @@ export class Stock {
   @Column({ nullable: false })
   lotSize: number;
 
-  @OneToMany(() => OHLC, (ohlc) => ohlc.stock)
+  @OneToMany(() => OHLC, (ohlc) => ohlc.stockId)
   data: OHLC[];
 }

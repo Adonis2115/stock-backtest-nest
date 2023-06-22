@@ -6,16 +6,16 @@ export class OHLC {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'float', nullable: false })
   open: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'float', nullable: false })
   high: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'float', nullable: false })
   low: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'float', nullable: false })
   close: number;
 
   @Column({ nullable: false })
@@ -25,5 +25,5 @@ export class OHLC {
   time: Date;
 
   @ManyToOne(() => Stock, (stock) => stock.data)
-  stock: Stock;
+  stockId: number;
 }
