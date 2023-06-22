@@ -15,8 +15,8 @@ export class StocksController {
     return this.stocksService.getStock(getStockDto.stock);
   }
 
-  @Get('/price')
-  getStockData() {
-    return this.stocksService.getStockData();
+  @Post('/price')
+  getStockData(@Body() stock: { id: number }) {
+    return this.stocksService.getStockData(stock.id);
   }
 }

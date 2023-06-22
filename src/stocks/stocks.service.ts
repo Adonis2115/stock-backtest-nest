@@ -18,13 +18,14 @@ export class StocksService {
   async getAllStock() {
     return await this.stockRepo.find();
   }
-  async getStockData() {
+  async getStockData(id: number) {
+    const stock = await this.stockRepo.findOne({ where: { id: id } });
     const headers = {
       'Content-Type': 'application/json',
       'access-token': process.env.DHAN_TOKEN,
     };
     const data = {
-      symbol: 'TCS',
+      symbol: stock.symbol,
       exchangeSegment: 'NSE_EQ',
       instrument: 'EQUITY',
       expiryCode: 0,
