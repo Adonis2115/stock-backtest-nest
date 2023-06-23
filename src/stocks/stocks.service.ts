@@ -18,7 +18,6 @@ export class StocksService {
     return await this.stockRepo.findOne({ where: { id: id } });
   }
   async getAllStock() {
-    console.log(new Date());
     return await this.stockRepo.find();
   }
   async getStockAndOhlc(id: number, fromDate: Date, toDate: Date) {
