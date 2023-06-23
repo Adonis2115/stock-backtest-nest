@@ -11,72 +11,75 @@ export class MomentumService {
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
   ) {}
   async momentum(date: Date, backtest: boolean) {
-    let fromDate: Date;
-    let toDate: Date;
-    if (backtest) {
-      fromDate = date;
-      toDate = getDate12WeeksDate(fromDate, true);
-    } else {
-      toDate = date;
-      fromDate = getDate12WeeksDate(toDate, false);
-    }
-    const range = {
-      where: {
-        data: {
-          time: Between(fromDate, toDate),
-        },
-      },
-      relations: ['data'],
-    };
-    const allStocks = await this.stockRepo.find(range);
-    const top50 = await top50Function(allStocks);
-    return top50;
+    const range12Weeks = getRange(date, backtest, 12);
+    const allStocks12Weeks = await this.stockRepo.find(range12Weeks);
+    const top50 = await getTopNStocks(allStocks12Weeks, 50);
+    const range4Weeks = getRange(date, backtest, 4);
+    const allStocks4Weeks = await this.stockRepo.find(range4Weeks);
+    const top30 = await getTopNStocks(allStocks4Weeks, 30, top50);
+    const range1Weeks = getRange(date, backtest, 12);
+    const allStocks1Weeks = await this.stockRepo.find(range1Weeks);
+    const top10 = await getTopNStocks(allStocks1Weeks, 10, top30);
+    return top10;
   }
 }
-
-async function top50Function(
-  allStocks: Stock[],
-): Promise<StockReturn12Weeks[]> {
-  const AllStocksWith12WeekReturn: StockReturn12Weeks[] = [];
-  for (let i = 0; i < allStocks.length; i++) {
+function getRange(date: Date, backtest: boolean, weeks: number) {
+  let fromDate: Date;
+  let toDate: Date;
+  if (backtest) {
+    fromDate = date;
+    toDate = getToAndFromDate(fromDate, backtest, weeks);
+  } else {
+    toDate = date;
+    fromDate = getToAndFromDate(toDate, backtest, weeks);
+  }
+  const range = {
+    where: {
+      data: {
+        time: Between(fromDate, toDate),
+      },
+    },
+    relations: ['data'],
+  };
+  return range;
+}
+async function getTopNStocks(
+  allStocks12Weeks: Stock[],
+  numberOfStocks: number,
+  filterStocks?: StockListReturn[],
+): Promise<StockListReturn[]> {
+  const AllStocksWith12WeekReturn: StockListReturn[] = [];
+  for (let i = 0; i < allStocks12Weeks.length; i++) {
     let stockReturn =
-      (allStocks[i].data[allStocks[i].data.length - 1].close -
-        allStocks[i].data[0].close) /
+      (allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close -
+        allStocks12Weeks[i].data[0].close) /
       100;
     AllStocksWith12WeekReturn.push({
-      name: allStocks[i].name,
-      symbol: allStocks[i].symbol,
-      return_12_Weeks: stockReturn,
+      name: allStocks12Weeks[i].name,
+      symbol: allStocks12Weeks[i].symbol,
+      return: stockReturn,
     });
   }
-  AllStocksWith12WeekReturn.sort(
-    (a, b) => b.return_12_Weeks - a.return_12_Weeks,
-  );
-  return AllStocksWith12WeekReturn.slice(0, 50);
+  AllStocksWith12WeekReturn.sort((a, b) => b.return - a.return);
+  const topStockList = filterStocks
+    ? AllStocksWith12WeekReturn.filter((itemB) =>
+        filterStocks.some(
+          (itemA) => itemA.name === itemB.name && itemA.symbol === itemB.symbol,
+        ),
+      ).slice(0, numberOfStocks)
+    : AllStocksWith12WeekReturn;
+  return topStockList;
 }
 
-type StockReturn12Weeks = {
+type StockListReturn = {
   name: string;
   symbol: string;
-  return_12_Weeks: number;
-  return_4_Weeks?: number;
-  return_1_Weeks?: number;
+  return: number;
 };
 
-function areDates12OrMoreWeeksApart(fromDate: Date, toDate: Date) {
-  const date1 = new Date(fromDate);
-  const date2 = new Date(toDate);
-  const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const twelveWeeksInMilliseconds = 12 * millisecondsPerWeek;
-
-  const difference = Math.abs(date1.getTime() - date2.getTime());
-
-  return difference >= twelveWeeksInMilliseconds;
-}
-
-function getDate12WeeksDate(dateString: Date, after: boolean) {
+function getToAndFromDate(dateString: Date, backtest: boolean, weeks: number) {
   const date = new Date(dateString);
-  date.setDate(date.getDate() + (after ? +12 * 7 : -12 * 7));
+  date.setDate(date.getDate() + (backtest ? +weeks * 7 : -weeks * 7));
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
