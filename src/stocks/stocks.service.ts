@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Observable, map } from 'rxjs';
 import { OHLC } from 'src/entities/ohlc.entity';
 import { Stock } from 'src/entities/stocks.entity';
-import { FindOperator, Repository } from 'typeorm';
+import { Between, Equal, Repository } from 'typeorm';
 
 @Injectable()
 export class StocksService {
@@ -18,17 +18,20 @@ export class StocksService {
     return await this.stockRepo.findOne({ where: { id: id } });
   }
   async getAllStock() {
+    console.log(new Date());
     return await this.stockRepo.find();
   }
   async getStockAndOhlc(id: number, fromDate: Date, toDate: Date) {
+    let fDate = new Date(fromDate);
+    let tDate = new Date(toDate);
+    // let fromDateTimestamp = Math.floor(fDate.getTime() / 1000);
+    // let toDateTimestamp = Math.floor(tDate.getTime() / 1000);
+
     return await this.stockRepo.findOne({
       where: {
         id: id,
         data: {
-          time: {
-            MoreThan: fromDate,
-            LessThan: toDate,
-          } as unknown as FindOperator<Date>,
+          time: Between(fromDate, toDate),
         },
       },
       relations: ['data'],
@@ -37,11 +40,8 @@ export class StocksService {
   async getOhlc(id: number, fromDate: Date, toDate: Date) {
     return await this.ohlcRepo.find({
       where: {
-        stockId: id,
-        time: {
-          MoreThan: fromDate,
-          LessThan: toDate,
-        } as unknown as FindOperator<Date>,
+        stockId: Equal(id),
+        time: Between(fromDate, toDate),
       },
     });
   }

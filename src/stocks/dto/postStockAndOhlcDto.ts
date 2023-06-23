@@ -1,8 +1,8 @@
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 export class PostStockAndOhlcDto {
   @IsNumber()
   id: number;
-  @IsDate()
+  @IsString()
   fromDate: Date;
   @IsString()
   toDate: Date;
