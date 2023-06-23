@@ -22,11 +22,6 @@ export class StocksService {
     return await this.stockRepo.find();
   }
   async getStockAndOhlc(id: number, fromDate: Date, toDate: Date) {
-    let fDate = new Date(fromDate);
-    let tDate = new Date(toDate);
-    // let fromDateTimestamp = Math.floor(fDate.getTime() / 1000);
-    // let toDateTimestamp = Math.floor(tDate.getTime() / 1000);
-
     return await this.stockRepo.findOne({
       where: {
         id: id,
