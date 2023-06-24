@@ -11,13 +11,18 @@ export class MomentumService {
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
   ) {}
   async momentum(date: Date, backtest: boolean) {
-    const range12Weeks = getRange(date, backtest, 12);
+    const lastRecord = await this.ohlcRepo.findOne({
+      where: {},
+      order: { id: 'DESC' },
+    });
+    const lastDate = new Date(date) > lastRecord.time ? lastRecord.time : date;
+    const range12Weeks = getRange(lastDate, backtest, 12);
     const allStocks12Weeks = await this.stockRepo.find(range12Weeks);
     const top50 = await getTopNStocks(allStocks12Weeks, 50);
-    const range4Weeks = getRange(date, backtest, 4);
+    const range4Weeks = getRange(lastDate, backtest, 4);
     const allStocks4Weeks = await this.stockRepo.find(range4Weeks);
     const top30 = await getTopNStocks(allStocks4Weeks, 30, top50);
-    const range1Weeks = getRange(date, backtest, 12);
+    const range1Weeks = getRange(lastDate, backtest, 1);
     const allStocks1Weeks = await this.stockRepo.find(range1Weeks);
     const top10 = await getTopNStocks(allStocks1Weeks, 10, top30);
     return top10;
@@ -50,24 +55,27 @@ async function getTopNStocks(
 ): Promise<StockListReturn[]> {
   const AllStocksWith12WeekReturn: StockListReturn[] = [];
   for (let i = 0; i < allStocks12Weeks.length; i++) {
-    let stockReturn =
-      (allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close -
+    let stockReturn = (
+      ((allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close -
         allStocks12Weeks[i].data[0].close) /
-      100;
+        allStocks12Weeks[i].data[0].close) *
+      100
+    ).toFixed(2);
     AllStocksWith12WeekReturn.push({
       name: allStocks12Weeks[i].name,
       symbol: allStocks12Weeks[i].symbol,
-      return: stockReturn,
+      return: Number(stockReturn),
+      opening: allStocks12Weeks[i].data[0].close,
+      closing:
+        allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close,
     });
   }
   AllStocksWith12WeekReturn.sort((a, b) => b.return - a.return);
   const topStockList = filterStocks
     ? AllStocksWith12WeekReturn.filter((itemB) =>
-        filterStocks.some(
-          (itemA) => itemA.name === itemB.name && itemA.symbol === itemB.symbol,
-        ),
+        filterStocks.some((itemA) => itemA.symbol === itemB.symbol),
       ).slice(0, numberOfStocks)
-    : AllStocksWith12WeekReturn;
+    : AllStocksWith12WeekReturn.slice(0, numberOfStocks);
   return topStockList;
 }
 
@@ -75,6 +83,8 @@ type StockListReturn = {
   name: string;
   symbol: string;
   return: number;
+  opening: number;
+  closing: number;
 };
 
 function getToAndFromDate(dateString: Date, backtest: boolean, weeks: number) {
