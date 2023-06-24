@@ -28,6 +28,48 @@ export class MomentumService {
     return top10;
   }
 }
+
+async function getTopNStocks(
+  allStocksNWeeks: Stock[],
+  numberOfStocks: number,
+  filterStocks?: StockListReturn[],
+): Promise<StockListReturn[]> {
+  const stockListReturn: StockListReturn[] = [];
+  for (let i = 0; i < allStocksNWeeks.length; i++) {
+    let stockReturn = (
+      ((allStocksNWeeks[i].data[allStocksNWeeks[i].data.length - 1].close -
+        allStocksNWeeks[i].data[0].close) /
+        allStocksNWeeks[i].data[0].close) *
+      100
+    ).toFixed(2);
+    stockListReturn.push({
+      name: allStocksNWeeks[i].name,
+      symbol: allStocksNWeeks[i].symbol,
+      return: Number(stockReturn),
+      opening: allStocksNWeeks[i].data[0].close,
+      closing:
+        allStocksNWeeks[i].data[allStocksNWeeks[i].data.length - 1].close,
+    });
+  }
+  stockListReturn.sort((a, b) => b.return - a.return);
+  const topStockList = filterStocks
+    ? stockListReturn
+        .filter((itemB) =>
+          filterStocks.some((itemA) => itemA.symbol === itemB.symbol),
+        )
+        .slice(0, numberOfStocks)
+    : stockListReturn.slice(0, numberOfStocks);
+  return topStockList;
+}
+
+type StockListReturn = {
+  name: string;
+  symbol: string;
+  return: number;
+  opening: number;
+  closing: number;
+};
+
 function getRange(date: Date, backtest: boolean, weeks: number) {
   let fromDate: Date;
   let toDate: Date;
@@ -48,44 +90,6 @@ function getRange(date: Date, backtest: boolean, weeks: number) {
   };
   return range;
 }
-async function getTopNStocks(
-  allStocks12Weeks: Stock[],
-  numberOfStocks: number,
-  filterStocks?: StockListReturn[],
-): Promise<StockListReturn[]> {
-  const AllStocksWith12WeekReturn: StockListReturn[] = [];
-  for (let i = 0; i < allStocks12Weeks.length; i++) {
-    let stockReturn = (
-      ((allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close -
-        allStocks12Weeks[i].data[0].close) /
-        allStocks12Weeks[i].data[0].close) *
-      100
-    ).toFixed(2);
-    AllStocksWith12WeekReturn.push({
-      name: allStocks12Weeks[i].name,
-      symbol: allStocks12Weeks[i].symbol,
-      return: Number(stockReturn),
-      opening: allStocks12Weeks[i].data[0].close,
-      closing:
-        allStocks12Weeks[i].data[allStocks12Weeks[i].data.length - 1].close,
-    });
-  }
-  AllStocksWith12WeekReturn.sort((a, b) => b.return - a.return);
-  const topStockList = filterStocks
-    ? AllStocksWith12WeekReturn.filter((itemB) =>
-        filterStocks.some((itemA) => itemA.symbol === itemB.symbol),
-      ).slice(0, numberOfStocks)
-    : AllStocksWith12WeekReturn.slice(0, numberOfStocks);
-  return topStockList;
-}
-
-type StockListReturn = {
-  name: string;
-  symbol: string;
-  return: number;
-  opening: number;
-  closing: number;
-};
 
 function getToAndFromDate(dateString: Date, backtest: boolean, weeks: number) {
   const date = new Date(dateString);
