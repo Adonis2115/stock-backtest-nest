@@ -6,8 +6,15 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class TrendService {
+  TrendService(dateFrom: Date, dateTo: Date) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
   ) {}
+
+  async trend(dateFrom: Date, dateTo: Date) {
+    return 'Trend';
+  }
 }
