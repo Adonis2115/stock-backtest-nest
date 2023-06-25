@@ -22,10 +22,16 @@ export class TrendService {
       order: { id: 'ASC' },
     });
     let MaxInvestEachStock = balance / 10;
-    const startDateFrom =
-      new Date(startDate) < lastRecord.time ? lastRecord.time : startDate;
-    let toDate = getToAndFromDate(startDateFrom, true, 12); // change this every loop
-    let dates = getDates12WeeksApart(toDate, endDate); // bactest starting after 12 weeks correct it fro before if data is present
+    let week12before = getToAndFromDate(startDate, false, 12);
+    let startDateFrom = getToAndFromDate(week12before, true, 12);
+    const nearestDateAvailable = await this.ohlcRepo.findOne({
+      where: {
+        stockId: Equal(1),
+        time: MoreThanOrEqual(startDateFrom),
+      },
+    });
+    let toDate = nearestDateAvailable.time;
+    let dates = getDates12WeeksApart(toDate, endDate);
     let portfolioReturn = [];
     let sum = 0;
     for (let i = 0; i < dates.length; i++) {
