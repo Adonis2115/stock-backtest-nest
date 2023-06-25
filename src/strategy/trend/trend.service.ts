@@ -51,7 +51,7 @@ export class TrendService {
           );
           portfolio[j].invested = portfolio[j].quantity * portfolio[j].opening;
           portfolio[j].closingDate = nextWeekPrice.time;
-          sum = sum + stockReturn * portfolio[j].quantity;
+          sum = Number((sum + stockReturn * portfolio[j].quantity).toFixed(2));
         }
       }
       portfolioReturn.push(portfolio);
