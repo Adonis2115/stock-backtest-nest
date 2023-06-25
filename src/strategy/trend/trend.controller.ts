@@ -7,6 +7,10 @@ export class TrendController {
   constructor(private readonly trendService: TrendService) {}
   @Post()
   momentum(@Body() postTrendDto: PostTrendto) {
-    return this.trendService.trend(postTrendDto.dateFrom, postTrendDto.dateTo);
+    return this.trendService.trend(
+      postTrendDto.startDate,
+      postTrendDto.endDate,
+      postTrendDto.balance,
+    );
   }
 }

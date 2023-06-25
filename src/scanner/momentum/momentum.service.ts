@@ -43,12 +43,14 @@ async function getTopNStocks(
       100
     ).toFixed(2);
     stockListReturn.push({
+      stockId: allStocksNWeeks[i].id,
       name: allStocksNWeeks[i].name,
       symbol: allStocksNWeeks[i].symbol,
       return: Number(stockReturn),
       opening: allStocksNWeeks[i].data[0].close,
       closing:
         allStocksNWeeks[i].data[allStocksNWeeks[i].data.length - 1].close,
+      openDate: allStocksNWeeks[i].data[0].time,
     });
   }
   stockListReturn.sort((a, b) => b.return - a.return);
@@ -63,11 +65,17 @@ async function getTopNStocks(
 }
 
 type StockListReturn = {
+  stockId: number;
   name: string;
   symbol: string;
+  returnRs?: number;
   return: number;
   opening: number;
   closing: number;
+  openDate: Date;
+  closingDate?: Date;
+  quantity?: number;
+  invested?: number;
 };
 
 function getRange(date: Date, backtest: boolean, weeks: number) {
@@ -91,7 +99,11 @@ function getRange(date: Date, backtest: boolean, weeks: number) {
   return range;
 }
 
-function getToAndFromDate(dateString: Date, backtest: boolean, weeks: number) {
+export function getToAndFromDate(
+  dateString: Date,
+  backtest: boolean,
+  weeks: number,
+) {
   const date = new Date(dateString);
   date.setDate(date.getDate() + (backtest ? +weeks * 7 : -weeks * 7));
   const year = date.getFullYear();

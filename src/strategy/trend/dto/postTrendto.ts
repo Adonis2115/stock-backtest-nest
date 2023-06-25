@@ -1,7 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 export class PostTrendto {
   @IsString()
-  dateFrom: Date;
+  startDate: Date;
   @IsString()
-  dateTo: Date;
+  endDate: Date;
+  @IsNumber()
+  balance: number;
 }
