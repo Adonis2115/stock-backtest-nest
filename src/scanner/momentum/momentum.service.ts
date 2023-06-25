@@ -15,7 +15,7 @@ export class MomentumService {
       where: {},
       order: { id: 'DESC' },
     });
-
+    // bactest: true or false logic not used properly
     let week12before = getToAndFromDate(date, false, 12);
     const nearestDateAvailable = await this.ohlcRepo.findOne({
       where: {
