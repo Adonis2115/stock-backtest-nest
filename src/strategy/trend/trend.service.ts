@@ -10,12 +10,12 @@ import { Equal, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class TrendService {
+  //Backtest List & Scanner List not matching for date
   constructor(
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
     private readonly momentumService: MomentumService,
   ) {}
-
   async trend(startDate: Date, endDate: Date, balance: number) {
     const lastRecord = await this.ohlcRepo.findOne({
       where: {},
@@ -23,19 +23,21 @@ export class TrendService {
     });
     let MaxInvestEachStock = balance / 10;
     let week12before = getToAndFromDate(startDate, false, 12);
-    let startDateFrom = getToAndFromDate(week12before, true, 12);
     const nearestDateAvailable = await this.ohlcRepo.findOne({
       where: {
         stockId: Equal(1),
-        time: MoreThanOrEqual(startDateFrom),
+        time: MoreThanOrEqual(week12before),
       },
     });
-    let toDate = nearestDateAvailable.time;
+    let toDate =
+      week12before >= nearestDateAvailable.time
+        ? getToAndFromDate(week12before, true, 12)
+        : getToAndFromDate(nearestDateAvailable.time, true, 12);
     let dates = getDates12WeeksApart(toDate, endDate);
     let portfolioReturn = [];
     let sum = 0;
     for (let i = 0; i < dates.length; i++) {
-      let portfolio = await this.momentumService.momentum(dates[i], true);
+      let portfolio = await this.momentumService.momentum(dates[i], false);
       for (let j = 0; j < portfolio.length; j++) {
         const nextWeekPrice = await this.ohlcRepo.findOne({
           where: {
@@ -74,7 +76,11 @@ function getDates12WeeksApart(startDateString: Date, endDateString: Date) {
   const currentDate = new Date(startDate);
 
   while (currentDate <= endDate) {
-    dates.push(new Date(currentDate));
+    const date = new Date(currentDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    dates.push(`${year}-${month}-${day}` as unknown as Date);
     currentDate.setDate(currentDate.getDate() + 7);
   }
   return dates;

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OHLC } from 'src/entities/ohlc.entity';
 import { Stock } from 'src/entities/stocks.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Equal, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class MomentumService {
@@ -15,7 +15,18 @@ export class MomentumService {
       where: {},
       order: { id: 'DESC' },
     });
-    const lastDate = new Date(date) > lastRecord.time ? lastRecord.time : date;
+
+    let week12before = getToAndFromDate(date, false, 12);
+    const nearestDateAvailable = await this.ohlcRepo.findOne({
+      where: {
+        stockId: Equal(1),
+        time: MoreThanOrEqual(week12before),
+      },
+    });
+    let lastDate =
+      week12before >= nearestDateAvailable.time
+        ? getToAndFromDate(week12before, true, 12)
+        : getToAndFromDate(nearestDateAvailable.time, true, 12);
     const range12Weeks = getRange(lastDate, backtest, 12);
     const allStocks12Weeks = await this.stockRepo.find(range12Weeks);
     const top50 = await getTopNStocks(allStocks12Weeks, 50);
@@ -47,10 +58,10 @@ async function getTopNStocks(
       name: allStocksNWeeks[i].name,
       symbol: allStocksNWeeks[i].symbol,
       return: Number(stockReturn),
-      opening: allStocksNWeeks[i].data[0].close,
-      closing:
+      opening:
         allStocksNWeeks[i].data[allStocksNWeeks[i].data.length - 1].close,
-      openDate: allStocksNWeeks[i].data[0].time,
+      openDate:
+        allStocksNWeeks[i].data[allStocksNWeeks[i].data.length - 1].time,
     });
   }
   stockListReturn.sort((a, b) => b.return - a.return);
@@ -71,7 +82,7 @@ type StockListReturn = {
   returnRs?: number;
   return: number;
   opening: number;
-  closing: number;
+  closing?: number;
   openDate: Date;
   closingDate?: Date;
   quantity?: number;
@@ -109,6 +120,5 @@ export function getToAndFromDate(
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-
   return `${year}-${month}-${day}` as unknown as Date;
 }
