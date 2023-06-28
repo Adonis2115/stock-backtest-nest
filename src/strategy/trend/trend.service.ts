@@ -10,7 +10,6 @@ import { Equal, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class TrendService {
-  //Backtest List & Scanner List not matching for date
   constructor(
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,

@@ -10,3 +10,11 @@ export class AppController {
     return this.appService.getHello();
   }
 }
+
+/**
+ * ! Alert Comments
+ * * Simple Comment
+ * ? Query Comment
+ * todo ToDo's should go here
+ * // Strike through, least important notes(which are done maybe)
+ */
