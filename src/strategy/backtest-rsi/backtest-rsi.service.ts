@@ -12,4 +12,7 @@ export class BacktestRsiService {
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
     private readonly rsiService: RsiService,
   ) {}
+  async backtestRSI(startDate: Date, endDate: Date, balance: number) {
+    return 'Backtest RSI';
+  }
 }
