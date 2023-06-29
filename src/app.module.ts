@@ -8,6 +8,7 @@ import { Stock } from './entities/stocks.entity';
 import { StocksModule } from './stocks/stocks.module';
 import { MomentumModule } from './scanner/momentum/momentum.module';
 import { TrendModule } from './strategy/trend/trend.module';
+import { RsiModule } from './scanner/rsi/rsi.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TrendModule } from './strategy/trend/trend.module';
     }),
     MomentumModule,
     TrendModule,
+    RsiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
