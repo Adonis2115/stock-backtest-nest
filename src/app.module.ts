@@ -9,6 +9,7 @@ import { StocksModule } from './stocks/stocks.module';
 import { MomentumModule } from './scanner/momentum/momentum.module';
 import { TrendModule } from './strategy/trend/trend.module';
 import { RsiModule } from './scanner/rsi/rsi.module';
+import { BacktestRsiModule } from './strategy/backtest-rsi/backtest-rsi.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RsiModule } from './scanner/rsi/rsi.module';
     MomentumModule,
     TrendModule,
     RsiModule,
+    BacktestRsiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
