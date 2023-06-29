@@ -1,7 +1,7 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 export class PostRsiDto {
   @IsString()
   date: Date;
-  @IsBoolean()
-  backtest: boolean;
+  @IsNumber()
+  rsi: number;
 }

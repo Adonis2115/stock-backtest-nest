@@ -1,85 +1,10 @@
-[
-  [
-    {
-      stockId: 37,
-      name: 'Bhel Bharat Heavy Electricals Ltd',
-      symbol: 'BHEL',
-      return: 12.98,
-      opening: 72.05,
-      closing: 81.4,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 155,
-      name: 'Punjab National Bank Ltd',
-      symbol: 'PNB',
-      return: 12.18,
-      opening: 47.6,
-      closing: 53.4,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 15,
-      name: 'Apollo Tyres Ltd',
-      symbol: 'APOLLOTYRE',
-      return: 11.5,
-      opening: 280.45,
-      closing: 312.7,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 138,
-      name: 'Nbcc Ltd',
-      symbol: 'NBCC',
-      return: 10.34,
-      opening: 37.25,
-      closing: 41.1,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 117,
-      name: 'Lt Finance Holdings Ltd',
-      symbol: 'L&TFH',
-      return: 10.25,
-      opening: 80.5,
-      closing: 88.75,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 147,
-      name: 'Persistent Systems Ltd',
-      symbol: 'PERSISTENT',
-      return: 10.07,
-      opening: 3659.4,
-      closing: 4027.95,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 10,
-      name: 'Aditya Birla Capital Ltd',
-      symbol: 'ABCAPITAL',
-      return: 8.47,
-      opening: 126.35,
-      closing: 137.05,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 153,
-      name: 'Power Finance Corporation Ltd',
-      symbol: 'PFC',
-      return: 7.64,
-      opening: 125.05,
-      closing: 134.6,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-    {
-      stockId: 95,
-      name: 'Idfc Ltd',
-      symbol: 'IDFC',
-      return: 6.33,
-      opening: 77.4,
-      closing: 82.3,
-      openDate: '2022-11-27T18:30:00.000Z',
-    },
-  ],
+const arr = [
+  127.75, 129.02, 132.75, 145.4, 148.98, 137.52, 147.38, 139.05, 137.23, 149.3,
+  162.45, 178.95, 200.35, 221.9, 243.23, 243.52, 286.42, 280.27, 277.35, 269.02,
+  263.23, 214.9,
 ];
+
+const rsi = [86.41, 86.43, 89.65, 86.5, 84.96, 80.54, 77.56, 58.06];
+
+console.log(arr.length);
+console.log(rsi.length);

@@ -7,6 +7,6 @@ export class RsiController {
   constructor(private readonly rsiService: RsiService) {}
   @Post()
   rsi(@Body() postRsiDto: PostRsiDto) {
-    return this.rsiService.rsi(postRsiDto.date, postRsiDto.backtest);
+    return this.rsiService.rsi(postRsiDto.date, postRsiDto.rsi);
   }
 }
