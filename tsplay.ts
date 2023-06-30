@@ -1,10 +1,17 @@
-const arr = [
-  127.75, 129.02, 132.75, 145.4, 148.98, 137.52, 147.38, 139.05, 137.23, 149.3,
-  162.45, 178.95, 200.35, 221.9, 243.23, 243.52, 286.42, 280.27, 277.35, 269.02,
-  263.23, 214.9,
-];
+function getDates(startDate: Date, endDate: Date) {
+  var dateArray = [];
+  var currentDate = new Date(startDate);
 
-const rsi = [86.41, 86.43, 89.65, 86.5, 84.96, 80.54, 77.56, 58.06];
+  while (currentDate <= endDate) {
+    dateArray.push(currentDate.toISOString().slice(0, 10));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
 
-console.log(arr.length);
-console.log(rsi.length);
+  return dateArray;
+}
+
+var startDate = new Date('2023-01-01');
+var endDate = new Date('2023-01-02');
+
+var allDates = getDates(startDate, endDate);
+console.log(allDates);

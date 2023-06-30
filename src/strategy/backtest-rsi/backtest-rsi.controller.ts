@@ -10,6 +10,7 @@ export class BacktestRsiController {
     return this.backtestRsiService.backtestRSI(
       postBacktestRsiDto.startDate,
       postBacktestRsiDto.endDate,
+      postBacktestRsiDto.rsi,
       postBacktestRsiDto.balance,
     );
   }

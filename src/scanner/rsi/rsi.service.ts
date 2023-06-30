@@ -29,6 +29,8 @@ export class RsiService {
           stockName: stocksAll[i].name,
           stockSymbol: stocksAll[i].symbol,
           rsi: rsiValue,
+          price: stockOHLC[stockOHLC.length - 1].close,
+          date: stockOHLC[stockOHLC.length - 1].time,
         });
       }
     }
@@ -46,4 +48,6 @@ type StockRSI = {
   stockName: string;
   stockSymbol: string;
   rsi: number;
+  price: number;
+  date: Date;
 };

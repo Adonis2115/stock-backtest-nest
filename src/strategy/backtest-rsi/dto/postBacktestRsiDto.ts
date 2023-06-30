@@ -5,5 +5,7 @@ export class PostBacktestRsiDto {
   @IsString()
   endDate: Date;
   @IsNumber()
+  rsi: number;
+  @IsNumber()
   balance: number;
 }
