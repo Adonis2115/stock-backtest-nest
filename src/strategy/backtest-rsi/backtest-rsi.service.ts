@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OHLC } from 'src/entities/ohlc.entity';
 import { Stock } from 'src/entities/stocks.entity';
 import { RsiService } from 'src/scanner/rsi/rsi.service';
-import { Repository } from 'typeorm';
+import { RSI } from 'technicalindicators';
+import { Equal, LessThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class BacktestRsiService {
@@ -23,7 +24,8 @@ export class BacktestRsiService {
     for (let i = 0; i < dates.length; i++) {
       const scannerStockList = await this.rsiService.rsi(dates[i], rsi);
       const newStocks = scannerStockList.filter(
-        (obj1) => !position.some((obj2) => obj2.id === obj1.id),
+        (obj1) =>
+          !position.some((obj2) => obj2.id === obj1.id && !obj2.closePrice),
       );
       newStocks.map((item) =>
         position.push({
@@ -36,17 +38,51 @@ export class BacktestRsiService {
           openDate: item.date,
         }),
       );
-      // for (let j = 0; j < scannerStockList.length; j++) {
-      //   const newStockToAdd = position.find(
-      //     (obj) => obj.id !== scannerStockList[j].id,
-      //   );
-      //   console.log(newStockToAdd);
-      // }
+      position.map(async (stock, index) => {
+        if (
+          !scannerStockList.some((obj2) => obj2.id === stock.id) &&
+          !stock.closePrice
+        ) {
+          const stockOHLC = await this.ohlcRepo.find({
+            where: {
+              stockId: Equal(stock.id),
+              time: LessThanOrEqual(dates[i]),
+            },
+          });
+          const closeValues = stockOHLC.map((item) => item.close);
+          const { rsiValue, priceAtRSI } = await getRSI(closeValues);
+          if (rsiValue < 55) {
+            (position[index].closeRsi = rsiValue),
+              (position[index].closePrice = priceAtRSI),
+              (position[index].pnl =
+                (position[index].closePrice - position[index].openPrice) *
+                position[index].quantity),
+              (position[index].closeDate = dates[i]);
+          } else {
+            position[index].pnl =
+              (priceAtRSI - position[index].openPrice) *
+              position[index].quantity;
+          }
+        }
+      });
     }
-    // ! check stock is not already in position for new position
-    // ! To exit check stock is in position and satisfies exit RSI
+    const sum = position.reduce((accumulator, obj) => {
+      if (obj.pnl) {
+        return accumulator + obj.pnl;
+      }
+      return accumulator;
+    }, 0);
+    console.log(sum);
     return position;
   }
+}
+
+async function getRSI(closeValues: number[]) {
+  const calculatedRSI = RSI.calculate({ values: closeValues, period: 14 });
+  return {
+    rsiValue: calculatedRSI[calculatedRSI.length - 1],
+    priceAtRSI: closeValues[closeValues.length - 1],
+  };
 }
 
 function getDates(startDate: Date, endDate: Date) {

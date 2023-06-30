@@ -22,14 +22,14 @@ export class RsiService {
         },
       });
       const closeValues = stockOHLC.map((item) => item.close);
-      const rsiValue = await getRSI(closeValues);
+      const { rsiValue, priceAtRSI } = await getRSI(closeValues);
       if (rsiValue >= rsi) {
         rsiValues.push({
           id: stocksAll[i].id,
           stockName: stocksAll[i].name,
           stockSymbol: stocksAll[i].symbol,
           rsi: rsiValue,
-          price: stockOHLC[stockOHLC.length - 1].close,
+          price: priceAtRSI,
           date: stockOHLC[stockOHLC.length - 1].time,
         });
       }
@@ -40,7 +40,10 @@ export class RsiService {
 
 async function getRSI(closeValues: number[]) {
   const calculatedRSI = RSI.calculate({ values: closeValues, period: 14 });
-  return calculatedRSI[calculatedRSI.length - 1];
+  return {
+    rsiValue: calculatedRSI[calculatedRSI.length - 1],
+    priceAtRSI: closeValues[closeValues.length - 1],
+  };
 }
 
 type StockRSI = {
