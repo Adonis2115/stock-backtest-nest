@@ -27,7 +27,7 @@ export class BacktestRsiService {
         (obj1) =>
           !position.some((obj2) => obj2.id === obj1.id && !obj2.closePrice),
       );
-      newStocks.map((item) =>
+      newStocks.map((item) => {
         position.push({
           id: item.id,
           stockName: item.stockName,
@@ -36,8 +36,8 @@ export class BacktestRsiService {
           openPrice: item.price,
           quantity: Math.floor(balance / 10 / item.price),
           openDate: item.date,
-        }),
-      );
+        });
+      });
       position.map(async (stock, index) => {
         if (
           !scannerStockList.some((obj2) => obj2.id === stock.id) &&
@@ -72,7 +72,7 @@ export class BacktestRsiService {
       }
       return accumulator;
     }, 0);
-    console.log(sum);
+    console.log(`Profit: ${sum}`);
     return position;
   }
 }
