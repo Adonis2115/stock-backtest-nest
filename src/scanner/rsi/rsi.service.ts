@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OHLC } from 'src/entities/ohlc.entity';
 import { Stock } from 'src/entities/stocks.entity';
-import { RSI } from 'technicalindicators';
-import { Equal, LessThanOrEqual, Repository } from 'typeorm';
+import { CrossUp, RSI } from 'technicalindicators';
+import { LessThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class RsiService {
@@ -12,23 +12,33 @@ export class RsiService {
     @InjectRepository(OHLC) private readonly ohlcRepo: Repository<OHLC>,
   ) {}
   async rsi(date: Date, rsi: number) {
-    const stocksAll = await this.stockRepo.find({});
-    let rsiValues: StockRSI[] = [];
-    for (let i = 0; i < stocksAll.length; i++) {
-      const stockOHLC = await this.ohlcRepo.find({
-        where: {
-          stockId: Equal(stocksAll[i].id),
+    const stocksAll = await this.stockRepo.find({
+      where: {
+        data: {
           time: LessThanOrEqual(date),
         },
-      });
+      },
+      relations: ['data'],
+    });
+    let rsiValues: StockRSI[] = [];
+    for (let i = 0; i < stocksAll.length; i++) {
+      const stockOHLC = stocksAll[i].data;
       const closeValues = stockOHLC.map((item) => item.close);
-      const { rsiValue, priceAtRSI } = await getRSI(closeValues);
-      if (rsiValue >= rsi) {
+      const { calculatedRSI, priceAtRSI } = await getRSI(closeValues);
+      const rsiCrossValue = Array.from(
+        { length: calculatedRSI.length },
+        () => rsi,
+      );
+      const isRsiCross = CrossUp.calculate({
+        lineA: calculatedRSI,
+        lineB: rsiCrossValue,
+      });
+      if (isRsiCross[isRsiCross.length - 1]) {
         rsiValues.push({
           id: stocksAll[i].id,
           stockName: stocksAll[i].name,
           stockSymbol: stocksAll[i].symbol,
-          rsi: rsiValue,
+          rsi: calculatedRSI[calculatedRSI.length - 1],
           price: priceAtRSI,
           date: stockOHLC[stockOHLC.length - 1].time,
         });
@@ -41,7 +51,7 @@ export class RsiService {
 async function getRSI(closeValues: number[]) {
   const calculatedRSI = RSI.calculate({ values: closeValues, period: 14 });
   return {
-    rsiValue: calculatedRSI[calculatedRSI.length - 1],
+    calculatedRSI: calculatedRSI,
     priceAtRSI: closeValues[closeValues.length - 1],
   };
 }
